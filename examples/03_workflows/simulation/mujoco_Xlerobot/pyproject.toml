@@ -1,0 +1,16 @@
+# XLeRobot MuJoCo 仿真示例的节点运行时依赖（dora --uv 以此目录为 uv 项目根）。
+# 依赖全部来自 PyPI；forge 运行时包与仓库根 pyproject 同源（forge-common/forge-msgs）。
+[project]
+name = "xlerobot-mujoco-sim-demo"
+version = "0.1.0"
+description = "Runtime deps for the XLeRobot MuJoCo simulation demo dataflow"
+requires-python = ">=3.12"
+dependencies = [
+    "dora-rs==0.4.1",
+    "forge-common>=1.0.1,<2",
+    "forge-msgs>=1.0.1,<2",
+    "mujoco==3.3.7",
+    "numpy",
+    "opencv-python",
+    "pyyaml>=6.0",
+]

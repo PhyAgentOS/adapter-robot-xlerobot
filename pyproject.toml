@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "robots-xlerobot"
+version = "0.1.0"
+description = "Safe FTServo access for the XLeRobot dual arms and omni base"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
+authors = [{ name = "PhyAgentOS Contributors" }]
+maintainers = [{ name = "PhyAgentOS Contributors" }]
+keywords = ["robot", "xlerobot", "servo", "dora", "forge", "robotics"]
+dependencies = [
+    "dora-rs==0.4.1",
+    "typer>=0.25.1",
+    "forge-common>=1.0.1,<2",
+    "forge-msgs>=1.0.1,<2",
+    "forge-robot>=1.0.1,<2",
+    "pyserial>=3.5",
+    "pyyaml>=6",
+]
+
+[project.urls]
+Homepage = "https://github.com/Forgelab-Robotics/adapter-robot-xlerobot"
+Documentation = "https://github.com/Forgelab-Robotics/adapter-robot-xlerobot#readme"
+Repository = "https://github.com/Forgelab-Robotics/adapter-robot-xlerobot.git"
+Issues = "https://github.com/Forgelab-Robotics/adapter-robot-xlerobot/issues"
+
+[project.scripts]
+robots-xlerobot = "robots_xlerobot.main:main"
+
+[project.optional-dependencies]
+pyinstaller = ["pyinstaller>=6.0"]
+test = ["pytest>=8"]
+sim = ["mujoco==3.3.7", "numpy", "opencv-python"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/robots_xlerobot"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,15 @@
+# XLeRobot 真机动作 workflow 的节点运行时依赖（dora --uv 以此目录为 uv 项目根）
+# 首次 `dora build dataflow.yaml --uv` 会生成 uv.lock。
+# robots-xlerobot 以本仓根目录为可编辑路径依赖；其 forge-* 依赖由根项目从 PyPI 解析。
+[project]
+name = "xlerobot-real-basic-motion"
+version = "0.1.0"
+description = "Runtime deps for the XLeRobot real basic-motion dataflow"
+requires-python = ">=3.12"
+dependencies = [
+    "dora-rs==0.4.1",
+    "robots-xlerobot",
+]
+
+[tool.uv.sources]
+robots-xlerobot = { path = "../../../", editable = true }

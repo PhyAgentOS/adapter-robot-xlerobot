@@ -1,0 +1,23 @@
+# 与 simulator / task_robot 的 joint_order、图像 output id 一致
+joint_order:
+  - slide_joint_x
+  - slide_joint_y
+  - hinge_joint_z
+  - Rotation_R
+  - Pitch_R
+  - Elbow_R
+  - Wrist_Pitch_R
+  - Wrist_Roll_R
+  - Jaw_R
+  - Rotation_L
+  - Pitch_L
+  - Elbow_L
+  - Wrist_Pitch_L
+  - Wrist_Roll_L
+  - Jaw_L
+  - ST3215_Servo_Motor-v1-1_Hub-2---Servo
+  - ST3215_Servo_Motor-v1-2_Hub---Servo
+  - ST3215_Servo_Motor-v1_Revolute-40
+image_input_ids:
+port: 8765
+broadcast_hz: 24

@@ -1,0 +1,13 @@
+# Runtime dependencies for the XLeRobot physical locomotion smoke workflow.
+[project]
+name = "xlerobot-real-basic-locomotion"
+version = "0.1.0"
+description = "Runtime deps for the XLeRobot real locomotion dataflow"
+requires-python = ">=3.12"
+dependencies = [
+    "dora-rs==0.4.1",
+    "robots-xlerobot",
+]
+
+[tool.uv.sources]
+robots-xlerobot = { path = "../../../", editable = true }

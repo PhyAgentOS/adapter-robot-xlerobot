@@ -1,0 +1,79 @@
+# XLeRobot 真机双臂配置模板
+#
+# 用法：复制成本目录 robot.yaml（或任意路径），把下面两条串口路径改成你自己机器人的
+# 值，再用脚本的 --config 指向它：
+#     python examples/01_sdk_tests/read_state.py --config config/robot.yaml
+#
+# 串口路径怎么选：
+# - 强烈建议用 /dev/serial/by-id/... 这种 by-id 路径。它编码了 USB 适配器的唯一序列号，
+#   无论插哪个口、重启/重插后都稳定指向同一个物理适配器。用 `ls /dev/serial/by-id/` 查看。
+# - 不要写 /dev/ttyACM0、/dev/ttyACM1：那是内核按枚举顺序动态分配的，重插/重启后可能互换，
+#   导致左臂/右臂静默对调（你让左臂动、结果右臂动），很危险。
+# - 下面两行串口号只是「这台示例机器人」的值，换成你自己的。
+#
+# 左右臂对应（官方 XLeRobot 接线，所有 XLeRobot 一致，与具体串口号无关）：
+# - 左臂总线 = 还串着 2 个头部电机（位置模式，ID 7-8）的那条总线。
+# - 右臂总线 = 还串着 3 个底盘轮子电机（速度模式，ID 7-9）的那条总线。
+#   确认方法：读一遍状态，看哪条总线的 ID 7-8 是位置模式（=头部=左臂）、哪条 ID 7-9
+#   是速度模式（=轮子=右臂）。
+#
+# 其它说明：
+# - ID 1..6 是两条总线上各自的双臂/夹爪槽位；ID 7..8（左臂总线=头部）、ID 7..9
+#   （右臂总线=轮子）中，头部只读诊断；轮子通过标准 LocomotionCommand 控制。
+# - position_min_ticks / position_max_ticks 留空表示运动时从电机 EEPROM 实时读取
+#   限位并做交集校验；写死会覆盖实时限位，非必要不要填。
+
+buses:
+  left_bus:
+    name: left_bus
+    port: /dev/serial/by-id/usb-1a86_USB_Single_Serial_5A7C122915-if00
+    baudrate: 1000000
+    motor_ids: [1, 2, 3, 4, 5, 6, 7, 8]
+  right_bus:
+    name: right_bus
+    port: /dev/serial/by-id/usb-1a86_USB_Single_Serial_5A7C123294-if00
+    baudrate: 1000000
+    motor_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+motors:
+  # 左臂（5A7C122915，含头部）
+  - { name: left_arm_shoulder_pan,  bus: left_bus, id: 1, motion_enabled: true, control_mode: position }
+  - { name: left_arm_shoulder_lift, bus: left_bus, id: 2, motion_enabled: true, control_mode: position }
+  - { name: left_arm_elbow_flex,    bus: left_bus, id: 3, motion_enabled: true, control_mode: position }
+  - { name: left_arm_wrist_flex,    bus: left_bus, id: 4, motion_enabled: true, control_mode: position }
+  - { name: left_arm_wrist_roll,    bus: left_bus, id: 5, motion_enabled: true, control_mode: position }
+  - { name: left_arm_gripper,       bus: left_bus, id: 6, motion_enabled: true, control_mode: position }
+  # 右臂（5A7C123294，含轮子）
+  - { name: right_arm_shoulder_pan,  bus: right_bus, id: 1, motion_enabled: true, control_mode: position }
+  - { name: right_arm_shoulder_lift, bus: right_bus, id: 2, motion_enabled: true, control_mode: position }
+  - { name: right_arm_elbow_flex,    bus: right_bus, id: 3, motion_enabled: true, control_mode: position }
+  - { name: right_arm_wrist_flex,    bus: right_bus, id: 4, motion_enabled: true, control_mode: position }
+  - { name: right_arm_wrist_roll,    bus: right_bus, id: 5, motion_enabled: true, control_mode: position }
+  - { name: right_arm_gripper,       bus: right_bus, id: 6, motion_enabled: true, control_mode: position }
+  # 头部只读诊断；轮子是速度模式（运行时只校验，不写 EEPROM 模式）
+  - { name: left_head_1,     bus: left_bus,  id: 7, motion_enabled: false, control_mode: diagnostic }
+  - { name: left_head_2,     bus: left_bus,  id: 8, motion_enabled: false, control_mode: diagnostic }
+  - { name: base_left_wheel,  bus: right_bus, id: 7, motion_enabled: false, control_mode: velocity }
+  - { name: base_back_wheel,  bus: right_bus, id: 8, motion_enabled: false, control_mode: velocity }
+  - { name: base_right_wheel, bus: right_bus, id: 9, motion_enabled: false, control_mode: velocity }
+
+# 运动参数（原始单位；speed=0 不视为“最慢”）
+move_speed_raw: 400
+move_acceleration_raw: 50
+command_timeout_s: 2.0
+# 归中和回初始位姿的最大等待时间；反馈全部到位会提前结束。
+feedback_timeout_s: 20.0
+# 有负载关节存在稳态误差，归中和回初始位姿允许 ±40 ticks。
+homing_tolerance_ticks: 40
+
+# 三全向轮底盘参数。vx/vy 单位 m/s，wz 单位 rad/s。
+wheel_radius_m: 0.05
+base_radius_m: 0.125
+locomotion_max_vx_mps: 0.05
+locomotion_max_vy_mps: 0.05
+locomotion_max_wz_radps: 0.4
+# 官方示例上限是 3000；首次接入保守限制为 1000。
+wheel_max_speed_raw: 1000
+wheel_acceleration_raw: 10
+# 非零底盘命令超过此时间未刷新，看门狗自动写三轮零速。
+locomotion_command_timeout_s: 0.25

@@ -1,0 +1,72 @@
+# MuJoCo 节点：xlerobot（scene.xml + attach prefix=item_1/）
+# model_path 相对本文件所在目录解析
+model_path: ../../../../assets/mjcf/scene.xml
+control_hz: 50
+image_format: raw
+
+# 相机名需与编译后模型一致（attach 后为 item_1/head_cam 等）
+image_forward:
+  {}
+
+# Action / ProprioState 的关节顺序（与 robots.joint_to_actuator 的键一致）
+joints:
+  - { name: slide_joint_x, mode: velocity, unit: meters/s }
+  - { name: slide_joint_y, mode: velocity, unit: meters/s }
+  - { name: hinge_joint_z, mode: velocity, unit: radians/s }
+  - { name: Rotation_R, mode: position, unit: radians }
+  - { name: Pitch_R, mode: position, unit: radians }
+  - { name: Elbow_R, mode: position, unit: radians }
+  - { name: Wrist_Pitch_R, mode: position, unit: radians }
+  - { name: Wrist_Roll_R, mode: position, unit: radians }
+  - { name: Jaw_R, mode: position, unit: radians }
+  - { name: Rotation_L, mode: position, unit: radians }
+  - { name: Pitch_L, mode: position, unit: radians }
+  - { name: Elbow_L, mode: position, unit: radians }
+  - { name: Wrist_Pitch_L, mode: position, unit: radians }
+  - { name: Wrist_Roll_L, mode: position, unit: radians }
+  - { name: Jaw_L, mode: position, unit: radians }
+  - { name: ST3215_Servo_Motor-v1-1_Hub-2---Servo, mode: velocity, unit: radians/s }
+  - { name: ST3215_Servo_Motor-v1-2_Hub---Servo, mode: velocity, unit: radians/s }
+  - { name: ST3215_Servo_Motor-v1_Revolute-40, mode: velocity, unit: radians/s }
+
+robots:
+  - id: robot_0
+    prefix: item_1/
+    actuator_order:
+      - slider_actuator_x
+      - slider_actuator_y
+      - hinge_actuator_z
+      - Rotation_R
+      - Pitch_R
+      - Elbow_R
+      - Wrist_Pitch_R
+      - Wrist_Roll_R
+      - Jaw_R
+      - Rotation_L
+      - Pitch_L
+      - Elbow_L
+      - Wrist_Pitch_L
+      - Wrist_Roll_L
+      - Jaw_L
+      - wheel1
+      - wheel2
+      - wheel3
+    joint_to_actuator:
+      slide_joint_x: slider_actuator_x
+      slide_joint_y: slider_actuator_y
+      hinge_joint_z: hinge_actuator_z
+      Rotation_R: Rotation_R
+      Pitch_R: Pitch_R
+      Elbow_R: Elbow_R
+      Wrist_Pitch_R: Wrist_Pitch_R
+      Wrist_Roll_R: Wrist_Roll_R
+      Jaw_R: Jaw_R
+      Rotation_L: Rotation_L
+      Pitch_L: Pitch_L
+      Elbow_L: Elbow_L
+      Wrist_Pitch_L: Wrist_Pitch_L
+      Wrist_Roll_L: Wrist_Roll_L
+      Jaw_L: Jaw_L
+      ST3215_Servo_Motor-v1-1_Hub-2---Servo: wheel1
+      ST3215_Servo_Motor-v1-2_Hub---Servo: wheel2
+      ST3215_Servo_Motor-v1_Revolute-40: wheel3

@@ -1,0 +1,29 @@
+#! XLeRobot 真机基础动作 workflow：标准 driver 节点（follower）+ hold/nudge 动作源。
+#!
+#! 前置：让 xlerobot venv 的 bin 排在 PATH 前面，确保 dora 用 venv 的 python3 启动节点：
+#!   source /home/wujunqi/framework/robots/xlerobot/.venv/bin/activate
+#!   cd examples/03_workflows/real_basic_motion
+#!   dora run dataflow.yaml
+#!
+#! 结束后务必释放扭矩（回到松态）：
+#!   python ../../01_sdk_tests/release_torque.py --config ../../../config/robot.yaml
+
+nodes:
+  - id: xlerobot
+    path: ../../../src/robots_xlerobot/main.py
+    inputs:
+      tick: dora/timer/millis/200
+      action: action_source/action
+    outputs:
+      - state
+    args: run --config ../../../config/robot.example.yaml --follower --debug
+
+  - id: action_source
+    path: ./action_source.py
+    inputs:
+      tick: dora/timer/millis/200
+      state: xlerobot/state
+    outputs:
+      - action
+    # 改 --nudge-rad 控制微动幅度（0.0 = 只 hold 不动）
+    args: --nudge-joint left_arm_shoulder_pan --nudge-rad 0.4

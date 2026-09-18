@@ -1,0 +1,23 @@
+#! XLeRobot 真机底盘基础运动：低速前进 2 秒，然后持续发送零速。
+#!
+#! 首次测试请把三只轮子架空并准备好断电；确认方向后再落地。
+#!   cd examples/03_workflows/real_basic_locomotion
+#!   dora run dataflow.yaml --uv
+
+nodes:
+  - id: xlerobot
+    path: ../../../src/robots_xlerobot/main.py
+    inputs:
+      tick: dora/timer/millis/100
+      locomotion_command: locomotion_source/locomotion_command
+    outputs:
+      - state
+    args: run --config ../../../config/robot.example.yaml --follower --debug
+
+  - id: locomotion_source
+    path: ./locomotion_source.py
+    inputs:
+      tick: dora/timer/millis/50
+    outputs:
+      - locomotion_command
+    args: --vx 0.05 --duration-s 2.0 --warmup-s 1.0
