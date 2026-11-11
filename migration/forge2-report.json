@@ -12,7 +12,48 @@
     ]
   },
   "dora_cli": "1.0.1",
-  "runtime_records": [],
+  "runtime_records": [
+    {
+      "repo": "adapter-robot-xlerobot",
+      "entry": "robots-xlerobot",
+      "mode": "chain",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/forge2/runtime-blocked/robots-xlerobot/chain/dataflow.yaml",
+        "--stop-after",
+        "4s"
+      ],
+      "includes_gateway": true,
+      "exit_code": 1,
+      "passed": false,
+      "status": "blocked / not accepted",
+      "elapsed_seconds": 1.137,
+      "error": null,
+      "scope": "Negative prerequisite diagnostic with unavailable local hardware endpoints, no physical actuation or remote SSH, and no model downloads. Not a successful node-operation or compatibility result.",
+      "log_file": "validation/forge2/runtime-blocked/robots-xlerobot/chain/dora.log"
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "entry": "robots-xlerobot",
+      "mode": "single",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/forge2/runtime-blocked/robots-xlerobot/single/dataflow.yaml",
+        "--stop-after",
+        "4s"
+      ],
+      "includes_gateway": false,
+      "exit_code": 1,
+      "passed": false,
+      "status": "blocked / not accepted",
+      "elapsed_seconds": 0.568,
+      "error": null,
+      "scope": "Negative prerequisite diagnostic with unavailable local hardware endpoints, no physical actuation or remote SSH, and no model downloads. Not a successful node-operation or compatibility result.",
+      "log_file": "validation/forge2/runtime-blocked/robots-xlerobot/single/dora.log"
+    }
+  ],
   "runtime_missing": "No matching serial robot hardware; production Dora and Gateway chain are pending.",
   "acceptance": "Pending final platform artifacts, applicable hardware/model execution and rollback/sustained-run gates.",
   "pillow_dependency": "Node locks currently resolve published Forge Msgs 2.0.0. Security audit remains dependent on Forge PR #3 and a published security-fixed Msgs release; no vulnerability suppression was added.",
