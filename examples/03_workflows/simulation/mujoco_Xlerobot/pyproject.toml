@@ -6,9 +6,9 @@ version = "0.1.0"
 description = "Runtime deps for the XLeRobot MuJoCo simulation demo dataflow"
 requires-python = ">=3.12"
 dependencies = [
-    "dora-rs==0.4.1",
-    "forge-common>=1.0.1,<2",
-    "forge-msgs>=1.0.1,<2",
+    "dora-rs>=1.0.1,<2",
+    "forge-common>=2.1.0,<3",
+    "forge-msgs>=2.0.0,<3",
     "mujoco==3.3.7",
     "numpy",
     "opencv-python",

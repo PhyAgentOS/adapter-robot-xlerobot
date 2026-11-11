@@ -1,0 +1,21 @@
+{
+  "repository": "adapter-robot-xlerobot",
+  "node_candidate_version": "2.0.0",
+  "baseline_commit": "5ceb37fdea4d6c7e454914b1b5e180b4728ef0fa",
+  "changes": [
+    "Upgrade driver and all three independent motion/locomotion/simulation example environments.",
+    "Synchronize English/Chinese root README guidance and frozen dependencies."
+  ],
+  "software_tests": {
+    "log": "tests.log",
+    "summary": [
+      "45 tests passed (45 pytest progress markers; command exited 0)."
+    ]
+  },
+  "dora_cli": "1.0.1",
+  "runtime_records": [],
+  "runtime_missing": "No matching serial robot hardware; production Dora and Gateway chain are pending.",
+  "acceptance": "Pending final platform artifacts, applicable hardware/model execution and rollback/sustained-run gates.",
+  "pillow_dependency": "Node locks currently resolve published Forge Msgs 2.0.0. Security audit remains dependent on Forge PR #3 and a published security-fixed Msgs release; no vulnerability suppression was added.",
+  "gitlab_synchronization": "Not started; follows full acceptance."
+}
