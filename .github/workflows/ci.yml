@@ -1,0 +1,25 @@
+name: Forge 2.x software contracts
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned uv
+        run: python -m pip install uv==0.13.7
+      - name: Verify frozen dependencies
+        run: |
+          uv lock --check
+          uv sync --frozen --extra test
+      - name: Run software contracts without robot hardware
+        run: uv run --frozen --extra test python -m pytest -o addopts= tests -q
+      - name: Verify Forge package majors
+        run: uv run --frozen --extra test python -c "from importlib.metadata import version; assert version('dora-rs') == '1.0.1'; assert version('forge-robot').startswith('2.'); assert version('forge-msgs').startswith('2.')"
