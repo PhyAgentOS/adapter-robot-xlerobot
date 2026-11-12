@@ -1,0 +1,276 @@
+{
+  "repository": "adapter-robot-xlerobot",
+  "round": "msgs-2.1.0 alignment / 2026-11-12",
+  "breaking_change": "Forge 1.x / Dora 0.4.x to Forge 2.x / Dora 1.x requires aligned Forge packages, runtime services, node peers and rebuilt artifacts. Forge families version independently. forge_msgs.v1 remains unchanged.",
+  "changes": [
+    "Update paired README deployment/version compatibility notice",
+    "Require Python forge-msgs >=2.1.0,<3 and lock public Msgs 2.1.0 / Pillow 13.0.0, preserving all other locked package versions"
+  ],
+  "lock_updates": [
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "examples/03_workflows/real_basic_locomotion/uv.lock",
+      "command": [
+        "${WORKSPACE}/.tools/bin/uv",
+        "lock",
+        "--upgrade-package",
+        "forge-msgs==2.1.0",
+        "--upgrade-package",
+        "pillow==13.0.0"
+      ],
+      "exit_code": 0,
+      "version_changes": [
+        {
+          "name": "forge-msgs",
+          "before": "2.0.0",
+          "after": "2.1.0"
+        },
+        {
+          "name": "pillow",
+          "before": "12.3.0",
+          "after": "13.0.0"
+        }
+      ]
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "examples/03_workflows/real_basic_motion/uv.lock",
+      "command": [
+        "${WORKSPACE}/.tools/bin/uv",
+        "lock",
+        "--upgrade-package",
+        "forge-msgs==2.1.0",
+        "--upgrade-package",
+        "pillow==13.0.0"
+      ],
+      "exit_code": 0,
+      "version_changes": [
+        {
+          "name": "forge-msgs",
+          "before": "2.0.0",
+          "after": "2.1.0"
+        },
+        {
+          "name": "pillow",
+          "before": "12.3.0",
+          "after": "13.0.0"
+        }
+      ]
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "examples/03_workflows/simulation/mujoco_Xlerobot/uv.lock",
+      "command": [
+        "${WORKSPACE}/.tools/bin/uv",
+        "lock",
+        "--upgrade-package",
+        "forge-msgs==2.1.0",
+        "--upgrade-package",
+        "pillow==13.0.0"
+      ],
+      "exit_code": 0,
+      "version_changes": [
+        {
+          "name": "forge-msgs",
+          "before": "2.0.0",
+          "after": "2.1.0"
+        },
+        {
+          "name": "pillow",
+          "before": "12.3.0",
+          "after": "13.0.0"
+        }
+      ]
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "uv.lock",
+      "command": [
+        "${WORKSPACE}/.tools/bin/uv",
+        "lock",
+        "--upgrade-package",
+        "forge-msgs==2.1.0",
+        "--upgrade-package",
+        "pillow==13.0.0"
+      ],
+      "exit_code": 0,
+      "version_changes": [
+        {
+          "name": "forge-msgs",
+          "before": "2.0.0",
+          "after": "2.1.0"
+        },
+        {
+          "name": "pillow",
+          "before": "12.3.0",
+          "after": "13.0.0"
+        }
+      ]
+    }
+  ],
+  "lock_checks": [
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "examples/03_workflows/real_basic_locomotion/uv.lock",
+      "check_exit": 0
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "examples/03_workflows/real_basic_motion/uv.lock",
+      "check_exit": 0
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "examples/03_workflows/simulation/mujoco_Xlerobot/uv.lock",
+      "check_exit": 0
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "lock": "uv.lock",
+      "check_exit": 0
+    }
+  ],
+  "software_tests": {
+    "repo": "adapter-robot-xlerobot",
+    "environment": "${WORKSPACE}/adapter-robot-xlerobot/.venv/bin/python",
+    "commands": [
+      [
+        "${WORKSPACE}/.tools/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "${WORKSPACE}/adapter-robot-xlerobot/.venv/bin/python",
+        "--no-deps",
+        "--index-url",
+        "https://pypi.org/simple",
+        "forge-msgs==2.1.0",
+        "pillow==13.0.0"
+      ],
+      [
+        "${WORKSPACE}/adapter-robot-xlerobot/.venv/bin/python",
+        "-c",
+        "from importlib.metadata import version; import json; print(json.dumps({n:version(n) for n in ['forge-msgs','pillow','dora-rs']}))"
+      ],
+      [
+        "${WORKSPACE}/.tools/bin/uv",
+        "pip",
+        "check",
+        "--python",
+        "${WORKSPACE}/adapter-robot-xlerobot/.venv/bin/python"
+      ],
+      [
+        "${WORKSPACE}/adapter-robot-xlerobot/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--import-mode=importlib"
+      ]
+    ],
+    "scope": "Existing local test environment with exact public Msgs/Pillow update; platform SDK exclusions are reported, not production acceptance.",
+    "update_exit": 0,
+    "versions_exit": 0,
+    "dependency_check_exit": 0,
+    "tests_exit": 0,
+    "test_summary": [
+      ".............................................                            [100%]"
+    ],
+    "installed_versions": {
+      "forge-msgs": "2.1.0",
+      "pillow": "13.0.0",
+      "dora-rs": "1.0.1"
+    }
+  },
+  "dependency_audit": {
+    "repo": "adapter-robot-xlerobot",
+    "audit_exit": 0,
+    "findings": [],
+    "skipped": []
+  },
+  "dora_run_records": [
+    {
+      "repo": "adapter-robot-xlerobot",
+      "entry": "robots-xlerobot",
+      "mode": "chain",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/downstream-msgs210-20261112/runtime-blocked/robots-xlerobot/chain/dataflow.yaml",
+        "--stop-after",
+        "4s"
+      ],
+      "includes_gateway": true,
+      "exit_code": 1,
+      "passed": false,
+      "status": "blocked / not accepted",
+      "elapsed_seconds": 0.868,
+      "error": null,
+      "scope": "Negative startup diagnostic only. Hardware endpoints were replaced with absent local devices, actions disabled, remote SSH excluded and model downloads disabled. This does not demonstrate successful node operation.",
+      "log_tail": [
+        "╰──────────────────────────────────────────────────────────────────────────────╯",
+        "SDKError: bus 'left_bus': cannot open '/dev/codex-forge2-no-device': [Errno 2] ",
+        "could not open port /dev/codex-forge2-no-device: [Errno 2] No such file or ",
+        "directory: '/dev/codex-forge2-no-device'",
+        "---------------------------------------------------------------------------------",
+        "",
+        "",
+        "",
+        "There is 1 more consequential error. Check the `out/01a1ced0-3a1b-7bd0-9124-55259cc7aba0` folder for full details.",
+        "",
+        "Location:",
+        "    binaries/cli/src/common.rs:55:17"
+      ],
+      "source_report": "runtime-blocked/robots-xlerobot/chain/report.json",
+      "runtime_errors": [
+        "2026-11-12T08:11:55.536628Z ERROR node_failure: dora_daemon::spawn::prepared: node exited with error: ExitCode(1) node_id=target dataflow_id=01a1ced0-3a1b-7bd0-9124-55259cc7aba0",
+        "16:11:55 ERROR  target: daemon exited with code 1 with stderr output:",
+        "16:11:56 stdout gateway: 2026-11-12 16:11:56 - forge_gateway.cli - ERROR - gateway startup failed: Could not initiate node from environment variable. For dynamic node, please add a node id in the initialization function.",
+        "2026-11-12T08:11:56.105478Z ERROR node_failure: dora_daemon::spawn::prepared: node exited with error: ExitCode(1) node_id=gateway dataflow_id=01a1ced0-3a1b-7bd0-9124-55259cc7aba0",
+        "16:11:56 ERROR  gateway: daemon exited with code 1. This error occurred because node `target` exited before connecting to dora."
+      ],
+      "local_evidence": "Full original Dora log is retained under validation/downstream-msgs210-20261112/runtime-blocked/robots-xlerobot/chain/dora.log"
+    },
+    {
+      "repo": "adapter-robot-xlerobot",
+      "entry": "robots-xlerobot",
+      "mode": "single",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/downstream-msgs210-20261112/runtime-blocked/robots-xlerobot/single/dataflow.yaml",
+        "--stop-after",
+        "4s"
+      ],
+      "includes_gateway": false,
+      "exit_code": 1,
+      "passed": false,
+      "status": "blocked / not accepted",
+      "elapsed_seconds": 0.479,
+      "error": null,
+      "scope": "Negative startup diagnostic only. Hardware endpoints were replaced with absent local devices, actions disabled, remote SSH excluded and model downloads disabled. This does not demonstrate successful node operation.",
+      "log_tail": [
+        "│       {bus.port!r}\")                                                         │",
+        "│   180 │   │   │   │   self._ports[name] = port                               │",
+        "╰──────────────────────────────────────────────────────────────────────────────╯",
+        "SDKError: bus 'left_bus': cannot open '/dev/codex-forge2-no-device': [Errno 2] ",
+        "could not open port /dev/codex-forge2-no-device: [Errno 2] No such file or ",
+        "directory: '/dev/codex-forge2-no-device'",
+        "---------------------------------------------------------------------------------",
+        "",
+        "",
+        "",
+        "Location:",
+        "    binaries/cli/src/common.rs:55:17"
+      ],
+      "source_report": "runtime-blocked/robots-xlerobot/single/report.json",
+      "runtime_errors": [
+        "2026-11-12T08:11:55.379128Z ERROR node_failure: dora_daemon::spawn::prepared: node exited with error: ExitCode(1) node_id=target dataflow_id=01a1ced0-38c7-7796-a4b9-cd41a14c19b2",
+        "16:11:55 ERROR  target: daemon exited with code 1 with stderr output:"
+      ],
+      "local_evidence": "Full original Dora log is retained under validation/downstream-msgs210-20261112/runtime-blocked/robots-xlerobot/single/dora.log"
+    }
+  ],
+  "remaining": "Applicable actual hardware/model, final supported-platform artifacts, sustained run and rollback acceptance remain pending.",
+  "acceptance": "Pending; software checks, fake/dummy backends and negative prerequisite records are scoped evidence only. Every new multi-node graph contains adapter-forge-gateway.",
+  "gitlab_sync": "Not performed; follows completed acceptance.",
+  "log_publication": "Original logs remain in the local validation workspace. This public report publishes reviewed commands, outcomes, assertions and limitations only."
+}

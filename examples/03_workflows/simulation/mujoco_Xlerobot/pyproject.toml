@@ -8,7 +8,7 @@ requires-python = ">=3.12"
 dependencies = [
     "dora-rs>=1.0.1,<2",
     "forge-common>=2.1.0,<3",
-    "forge-msgs>=2.0.0,<3",
+    "forge-msgs>=2.1.0,<3",
     "mujoco==3.3.7",
     "numpy",
     "opencv-python",
