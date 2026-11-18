@@ -1,0 +1,120 @@
+# XLeRobot（Forge 机器人交付包）
+
+[English](README.md) | [简体中文](README_zh.md)
+
+[查看机器人构型说明](description.md)
+
+## 交付内容
+
+| 内容 | 路径 |
+|------|------|
+| **MJCF + meshes** | `assets/mjcf/`，仿真入口为 `scene.xml`，主模型为 `xlerobot.xml` |
+| **GLB / 可视化资产** | `assets/glb/xlerobot.glb`，由 `robot_asset_pipeline` 生成 |
+| **仿真配置示例** | `examples/03_workflows/simulation/mujoco_Xlerobot/` |
+| **真机机器人节点** | `src/robots_xlerobot/` |
+| **真机机械臂基础动作** | `examples/03_workflows/real_basic_motion/` |
+| **真机底盘最小动作** | `examples/03_workflows/real_basic_locomotion/` |
+| **配置与标定** | `config/` |
+
+`forge_runtime` 当前没有内置 XLeRobot 专用 MuJoCo 示例。本仓提供的仿真 workflow
+直接使用 `assets/mjcf/scene.xml`；真机节点为标准 driver，通过 `task_robot`
+交换标准关节状态和动作消息。
+
+## 真机机器人契约
+
+- 两条 FTServo 串口总线共识别 17 个电机：左右臂及夹爪各 6 个位置模式电机，2 个头部
+  电机只读诊断，右总线 ID 7/8/9 是可控的三全向轮。
+- Forge 侧的 12 个运动关节顺序由 `src/robots_xlerobot/config.py` 中的
+  `JOINT_ORDER` 定义。
+- STS3215 的位置单位为一圈 4096 ticks；节点转换为弧度时使用“寄存器值增加为正方向”。
+  该坐标不等同于已对齐的 URDF/MJCF 零位，夹爪位置也不是米制开口。
+- 底层串口实现基于随包 vendor 的飞特 `scservo_sdk`；来源和版本见
+  `src/robots_xlerobot/_vendor/SOURCE.md`。
+
+### 移动底盘合同
+
+节点接受标准 Forge `locomotion_command` 输入（`forge_msgs.LocomotionCommand`）：
+`vx`、`vy` 分别为机体坐标系的前向和横向速度（m/s），`wz` 为角速度（rad/s）。
+三轮顺序固定为 `base_left_wheel`、`base_back_wheel`、`base_right_wheel`；正 `vx`
+对应机器人向前，驱动按三全向轮模型换算为有符号原始轮速。
+
+命令先经过 Forge 限速，再按 `wheel_max_speed_raw` 整体等比例缩放。驱动不会修改轮子
+EEPROM 模式；三个轮子必须预先处于 velocity mode 1。非零命令由 watchdog 监控，
+显式零命令和 `disconnect()` 都会向三轮写零速并释放轮子扭矩。
+
+## 目录结构
+
+| 路径 | 说明 |
+|------|------|
+| `assets/mjcf/` | MJCF、mesh、`scene.xml` 和模型图片 |
+| `assets/glb/` | Web / 可视化 GLB |
+| `assets/urdf/` | URDF 预留目录；当前未提供可用 URDF 模型 |
+| `config/` | 真机串口配置、标定备份和 VR 标定模板 |
+| `examples/01_sdk_tests/` | 不依赖 Forge/Dora 的串口只读与基础运动脚本 |
+| `examples/02_dora_tests/` | Dora 节点级测试占位说明 |
+| `examples/03_workflows/` | Forge/Dora 仿真与真机 workflow |
+| `src/robots_xlerobot/` | SDK、驱动和 Dora 节点源码 |
+| `scripts/` | 资产校验、生成和历史导入工具 |
+
+## 资产状态
+
+XLeRobot 的 MJCF、mesh 与 GLB 已落盘到本仓，常规仿真不依赖外部
+`robot-mj-model` 仓库：
+
+- `assets/mjcf/scene.xml`：MuJoCo 场景入口，模型前缀为 `item_1/`；
+- `assets/mjcf/xlerobot.xml`：机器人主体模型；
+- `assets/glb/xlerobot.glb`：Web / 可视化资产；
+- `assets/urdf/`：当前仅保留目录说明。
+
+## 仿真接入流程
+
+仿真配置位于 `examples/03_workflows/simulation/mujoco_Xlerobot/`，其
+`simulator.yaml` 指向本仓 `assets/mjcf/scene.xml`。分步说明和检查记录见：
+
+- `examples/03_workflows/simulation/SIMULATION_INTEGRATION.md`
+- `examples/03_workflows/simulation/JOINT_SWEEP_CHECKLIST.md`
+
+## `src/` 与 Forge 节点
+
+Python 包名为 `robots_xlerobot`。其中 `sdk.py` 管理串口和寄存器读写，
+`driver.py` 实现标准 `BaseRobotDriver` 协议（关节消息与 `LocomotionCommand` 桥接），`main.py` 提供 Dora
+节点入口（标准 `run_dora_robot_node` 循环）。真机 workflow 的动作源只收发 Dora
+消息，不直接访问串口。
+
+安装、模块职责和离线测试命令见 `src/README.md`。直连 SDK 用法见
+`examples/01_sdk_tests/README.md`；真机节点运行：
+`robots_xlerobot run --config config/robot.example.yaml --follower`；机械臂最小真机闭环见
+`examples/03_workflows/real_basic_motion/README.md`；底盘最小链路验证见
+`examples/03_workflows/real_basic_locomotion/README.md`。
+
+## 功能范围
+
+- 支持 17 个电机的状态读取和 12 个机械臂/夹爪关节的位置命令；
+- 支持通过标准 `LocomotionCommand` 控制三全向轮底盘；
+- 提供机械臂和底盘的最小真机 workflow；
+- 相机、遥操/同构、VR、VLA、录制与回放不在当前基础接入范围内。
+
+## 分版本发布
+
+| 维护线 | 源码 | 节点/包版本 | 运行时 |
+| --- | --- | --- | --- |
+| Forge 1.x | `stable/1.x` | `1.x`，标签 `v1.X.Y` | Forge 1.x / Dora 0.4.x |
+| Forge 2.x | `main` | `2.x`，标签 `v2.X.Y` | Forge 2.x / Dora 1.x |
+
+**旧版版本号统一：** `stable/1.x` 原为 0.x 的节点以 **1.0.0** 发布，保留 Forge 1.x / Dora 0.4.x 依赖与运行行为。已有 1.x 版本保留。节点/包主版本与 Forge 兼容线一致，不再接受 0.x 发布标签。
+
+两条线均从 `main` 运行 **Build versioned release**。先将版本和锁文件修改通过 PR 合并至对应源码分支，再在已审查提交上创建未占用的 **annotated** 标签，标签必须匹配包元数据。禁止移动已有标签或复用已发布版本。工作流使用自身已审查的发布工具与精确标签源码，旧标签无需包含新发布脚本。
+
+```bash
+# 替换为已存在、已审查、未发布且与源码元数据一致的标签。
+TAG=v1.0.0
+gh workflow run release.yml --ref main -f release_line=1.x -f tag="$TAG"
+TAG=v2.X.Y
+gh workflow run release.yml --ref main -f release_line=2.x -f tag="$TAG"
+```
+
+流水线校验标签类型、源码提交、分支归属、源码版本及锁定的 Forge/Dora 兼容性；构建源码归档及项目支持的 wheel/sdist，检查 Python 分发元数据与 SHA-256，并创建或附加至 **GitHub Release 草稿**。不覆盖已发布 Release 或产物；发布前检查全部构建结果与验收依据。该流程不发布节点包至 PyPI。
+
+设置 `build_binaries=true` 复用已有 Ubuntu 20.04 二进制工作流，保留原架构、CLI 和归档校验。也可直接运行 `build-ubuntu20.yml`，传入 `ref`、`version`、`release_line`；`ref` 必须为 annotated 标签，不能为移动分支。仅在所有选定任务通过后附加二进制产物。
+
+源码归档保留标签中的文件；外部 SDK/submodule、模型下载与现场配置仍是独立前置条件。依赖或 SDK 构建失败不能视为发布验收通过。构建成功不代表单节点或串联 `dora run`、真机、真实模型、长稳态或回滚验收通过；每条验收链必须包含相同兼容线的 `adapter-forge-gateway`。Forge 2.x 属于 **breaking change**，整个部署的 Forge 库、节点版本与 Dora 必须对齐；1.x 保留在维护分支。

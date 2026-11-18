@@ -1,93 +1,47 @@
-# XLeRobot（Forge 机器人交付包）
+# adapter-robot-xlerobot
 
-[查看机器人构型说明](description.md)
+[English](README.md) | [简体中文](README_zh.md)
 
-## 交付内容
+XLeRobot robot driver, assets and serial/Dora tools.
 
-| 内容 | 路径 |
-|------|------|
-| **MJCF + meshes** | `assets/mjcf/`，仿真入口为 `scene.xml`，主模型为 `xlerobot.xml` |
-| **GLB / 可视化资产** | `assets/glb/xlerobot.glb`，由 `robot_asset_pipeline` 生成 |
-| **仿真配置示例** | `examples/03_workflows/simulation/mujoco_Xlerobot/` |
-| **真机机器人节点** | `src/robots_xlerobot/` |
-| **真机机械臂基础动作** | `examples/03_workflows/real_basic_motion/` |
-| **真机底盘最小动作** | `examples/03_workflows/real_basic_locomotion/` |
-| **配置与标定** | `config/` |
+## Development and packaging
 
-`forge_runtime` 当前没有内置 XLeRobot 专用 MuJoCo 示例。本仓提供的仿真 workflow
-直接使用 `assets/mjcf/scene.xml`；真机节点为标准 driver，通过 `task_robot`
-交换标准关节状态和动作消息。
+Use Python 3.12 and the checked-in lock file.
 
-## 真机机器人契约
+```bash
+uv sync --frozen
+./scripts/build_pyinstaller.sh
+```
 
-- 两条 FTServo 串口总线共识别 17 个电机：左右臂及夹爪各 6 个位置模式电机，2 个头部
-  电机只读诊断，右总线 ID 7/8/9 是可控的三全向轮。
-- Forge 侧的 12 个运动关节顺序由 `src/robots_xlerobot/config.py` 中的
-  `JOINT_ORDER` 定义。
-- STS3215 的位置单位为一圈 4096 ticks；节点转换为弧度时使用“寄存器值增加为正方向”。
-  该坐标不等同于已对齐的 URDF/MJCF 零位，夹爪位置也不是米制开口。
-- 底层串口实现基于随包 vendor 的飞特 `scservo_sdk`；来源和版本见
-  `src/robots_xlerobot/_vendor/SOURCE.md`。
+CLI commands declared in `pyproject.toml`:
 
-### 移动底盘合同
+```text
+robots-xlerobot
+```
 
-节点接受标准 Forge `locomotion_command` 输入（`forge_msgs.LocomotionCommand`）：
-`vx`、`vy` 分别为机体坐标系的前向和横向速度（m/s），`wz` 为角速度（rad/s）。
-三轮顺序固定为 `base_left_wheel`、`base_back_wheel`、`base_right_wheel`；正 `vx`
-对应机器人向前，驱动按三全向轮模型换算为有符号原始轮速。
+See [robot description](description.md), `config/` or `configs/` for site-specific connection and calibration settings, `examples/` for hardware and simulation flows, and `scripts/` for build and verification helpers. Hardware actions require the actual device, reviewed limits and calibration; build success does not establish hardware acceptance. Detailed pre-existing operational guidance is retained in [the Chinese guide](README_zh.md). Preserve the repository and vendor licenses.
 
-命令先经过 Forge 限速，再按 `wheel_max_speed_raw` 整体等比例缩放。驱动不会修改轮子
-EEPROM 模式；三个轮子必须预先处于 velocity mode 1。非零命令由 watchdog 监控，
-显式零命令和 `disconnect()` 都会向三轮写零速并释放轮子扭矩。
+## Versioned releases
 
-## 目录结构
+| Release line | Source | Node/package version | Runtime |
+| --- | --- | --- | --- |
+| Forge 1.x | `stable/1.x` | `1.x`, tag `v1.X.Y` | Forge 1.x / Dora 0.4.x |
+| Forge 2.x | `main` | `2.x`, tag `v2.X.Y` | Forge 2.x / Dora 1.x |
 
-| 路径 | 说明 |
-|------|------|
-| `assets/mjcf/` | MJCF、mesh、`scene.xml` 和模型图片 |
-| `assets/glb/` | Web / 可视化 GLB |
-| `assets/urdf/` | URDF 预留目录；当前未提供可用 URDF 模型 |
-| `config/` | 真机串口配置、标定备份和 VR 标定模板 |
-| `examples/01_sdk_tests/` | 不依赖 Forge/Dora 的串口只读与基础运动脚本 |
-| `examples/02_dora_tests/` | Dora 节点级测试占位说明 |
-| `examples/03_workflows/` | Forge/Dora 仿真与真机 workflow |
-| `src/robots_xlerobot/` | SDK、驱动和 Dora 节点源码 |
-| `scripts/` | 资产校验、生成和历史导入工具 |
+**Legacy normalization:** nodes previously at 0.x on `stable/1.x` release as **1.0.0**, retaining Forge 1.x / Dora 0.4.x dependencies and runtime behavior. Existing 1.x package versions are retained. Node/package majors now follow the Forge compatibility line; a 0.x tag is rejected.
 
-## 资产状态
+Run **Build versioned release** from `main` for either line. First merge the version/lock changes into the selected source branch, then create an unused **annotated** tag on that reviewed commit. The tag must match package metadata. Never move existing tags or reuse a published version. Dispatch uses the workflow's reviewed tooling with the exact tagged source, so legacy tags need not contain the new release helper.
 
-XLeRobot 的 MJCF、mesh 与 GLB 已落盘到本仓，常规仿真不依赖外部
-`robot-mj-model` 仓库：
+```bash
+# Replace with an existing, reviewed and unpublished tag matching source metadata.
+TAG=v1.0.0
+gh workflow run release.yml --ref main -f release_line=1.x -f tag="$TAG"
+TAG=v2.X.Y
+gh workflow run release.yml --ref main -f release_line=2.x -f tag="$TAG"
+```
 
-- `assets/mjcf/scene.xml`：MuJoCo 场景入口，模型前缀为 `item_1/`；
-- `assets/mjcf/xlerobot.xml`：机器人主体模型；
-- `assets/glb/xlerobot.glb`：Web / 可视化资产；
-- `assets/urdf/`：当前仅保留目录说明。
+The workflow verifies tag type, source commit, branch ancestry, source version and locked Forge/Dora compatibility. It builds source archives and wheel/sdist where supported, checks Python distribution metadata and SHA-256, and creates or attaches to a **draft GitHub Release**. Published releases/assets are not overwritten; review all build results and acceptance evidence before publishing. This workflow does not publish node packages to PyPI.
 
-## 仿真接入流程
+Set `build_binaries=true` to call the existing Ubuntu 20.04 binary workflow; its existing architecture, CLI and archive checks remain in force. You can also run `build-ubuntu20.yml` directly with `ref`, `version` and `release_line`; `ref` must be an annotated tag, not a moving branch. Binary artifacts are attached only after all selected jobs succeed.
 
-仿真配置位于 `examples/03_workflows/simulation/mujoco_Xlerobot/`，其
-`simulator.yaml` 指向本仓 `assets/mjcf/scene.xml`。分步说明和检查记录见：
-
-- `examples/03_workflows/simulation/SIMULATION_INTEGRATION.md`
-- `examples/03_workflows/simulation/JOINT_SWEEP_CHECKLIST.md`
-
-## `src/` 与 Forge 节点
-
-Python 包名为 `robots_xlerobot`。其中 `sdk.py` 管理串口和寄存器读写，
-`driver.py` 实现标准 `BaseRobotDriver` 协议（关节消息与 `LocomotionCommand` 桥接），`main.py` 提供 Dora
-节点入口（标准 `run_dora_robot_node` 循环）。真机 workflow 的动作源只收发 Dora
-消息，不直接访问串口。
-
-安装、模块职责和离线测试命令见 `src/README.md`。直连 SDK 用法见
-`examples/01_sdk_tests/README.md`；真机节点运行：
-`robots_xlerobot run --config config/robot.example.yaml --follower`；机械臂最小真机闭环见
-`examples/03_workflows/real_basic_motion/README.md`；底盘最小链路验证见
-`examples/03_workflows/real_basic_locomotion/README.md`。
-
-## 功能范围
-
-- 支持 17 个电机的状态读取和 12 个机械臂/夹爪关节的位置命令；
-- 支持通过标准 `LocomotionCommand` 控制三全向轮底盘；
-- 提供机械臂和底盘的最小真机 workflow；
-- 相机、遥操/同构、VR、VLA、录制与回放不在当前基础接入范围内。
+The source archive preserves the tagged tree; external SDKs/submodules, model downloads and site configuration remain separate prerequisites. A dependency or SDK build failure is not successful release acceptance. Build success does not establish single-node or Gateway-chain `dora run`, hardware, real-model, sustained-run or rollback acceptance. Every acceptance chain must include `adapter-forge-gateway` from the same compatibility line. Forge 2.x is a **breaking change**: align Forge libraries, node versions and Dora across the entire deployment; keep 1.x on its maintenance branch.
