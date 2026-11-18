@@ -15,16 +15,15 @@
     "artifacts": [
       {
         "name": "robots_xlerobot-2.0.0-py3-none-any.whl",
-        "size": 38507,
-        "sha256": "4fe0a6c059e3156c312d40a36ea7afb952bd48d95743941261ba8765b719ad18"
+        "size": 38507
       },
       {
         "name": "robots_xlerobot-2.0.0.tar.gz",
-        "size": 12194798,
-        "sha256": "666569cc74879601432c6a16afce6976798616cfdf7beec563b195993424f91c"
+        "size": 12194798
       }
     ]
   },
+  "source_profile_scope": "Local candidate worktrees; proposed maintenance changes are not deployed or merged yet. Full checksums and raw logs remain in the local workspace.",
   "source_profiles": [
     {
       "repo": "PhyAgentOS/adapter-robot-xlerobot",
