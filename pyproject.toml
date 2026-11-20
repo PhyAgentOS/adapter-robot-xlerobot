@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "robots-xlerobot"
-version = "0.1.0"
+version = "1.0.0"
 description = "Safe FTServo access for the XLeRobot dual arms and omni base"
 readme = "README.md"
 requires-python = ">=3.12"
